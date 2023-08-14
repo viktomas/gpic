@@ -13,17 +13,28 @@ h1 {
 ul {
     list-style-type: none;
     display: flex;
+	gap: 0.5em;
     flex-wrap: wrap;
     justify-content: center;
     padding: 0;
 }
 
-li {
-    margin: 10px;
-}
-
 img {
-	display: block;
     max-width: 200px;
     max-height: 200px;
+}
+
+
+input[type="checkbox"] {
+	display:none;
+}
+
+input[type="checkbox"] + label{
+	display: flex;
+	padding: 0.5rem;
+	/* background-color: blue; */
+}
+
+input[type="checkbox"]:checked + label{
+	background-color: red;
 }
