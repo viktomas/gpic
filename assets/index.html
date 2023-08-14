@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>PicSort</title>
+	<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+	<h1>Images</h1>
+	<ul>
+		{{range .}}
+		<li><img src="/static/{{.}}" alt="{{.}}"></li>
+		{{end}}
+	</ul>
+</body>
+</html>
