@@ -12,8 +12,8 @@ import (
 	"sort"
 )
 
-//go:embed templates/index.html
-var indexTemplate string
+//go:embed templates/similar.html
+var simlarTemplate string
 
 //go:embed templates/compare-similar.html
 var compareSimilarTemplate string
@@ -40,7 +40,7 @@ func main() {
 	})
 
 	http.HandleFunc("/similar", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.New("index").Parse(indexTemplate))
+		tmpl := template.Must(template.New("index").Parse(simlarTemplate))
 		imageFiles := getImageFiles(rootFolder)
 
 		err := tmpl.Execute(w, imageFiles)
