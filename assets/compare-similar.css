@@ -2,12 +2,18 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background-color: #cfcfcf;
 }
 
 h1 {
     text-align: center;
     margin: 20px;
+}
+
+.control-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
 ul {
@@ -17,6 +23,7 @@ ul {
 }
 
 li {
+  flex: 1 0 33vw;
   padding: 0;
   list-style-type: none;
   max-height: 33vh;
@@ -26,10 +33,12 @@ li {
 .pic-num-2 li{
   max-height: 100vh;
   max-width: 50vw;
+  flex-basis: 50vw;
 }
 .pic-num-4 li {
   max-height: 50vh;
   max-width: 50vw;
+  flex-basis: 50vw;
 }
 
 label, .container, .li {
@@ -55,5 +64,5 @@ input[type="checkbox"] + label{
 }
 
 input[type="checkbox"]:checked + label{
-	background-color: green;
+	background-color: #55fc49;
 }

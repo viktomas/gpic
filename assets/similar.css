@@ -2,12 +2,18 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background-color: #cfcfcf;
 }
 
 h1 {
     text-align: center;
     margin: 20px;
+}
+
+.control-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
 ul {
@@ -36,5 +42,5 @@ input[type="checkbox"] + label{
 }
 
 input[type="checkbox"]:checked + label{
-	background-color: red;
+	background-color: #498afc;
 }
