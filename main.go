@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -41,9 +42,12 @@ func main() {
 
 	http.HandleFunc("/similar", func(w http.ResponseWriter, r *http.Request) {
 		tmpl := template.Must(template.New("index").Parse(simlarTemplate))
-		imageFiles := getImageFiles(rootFolder)
+		imageFiles, err := getImageFiles(rootFolder)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+		}
 
-		err := tmpl.Execute(w, imageFiles)
+		err = tmpl.Execute(w, imageFiles)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 		}
@@ -73,6 +77,50 @@ func main() {
 		}
 	})
 
+	http.HandleFunc("/delete-similar", func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseForm()
+		if err != nil {
+			http.Error(w, fmt.Sprintf("error parsing form %v", err.Error()), 500)
+			return
+		}
+
+		toDeleteFolder := "to-delete"
+		err = os.MkdirAll(filepath.Join(rootFolder, toDeleteFolder), 0755)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("error creating delete folder: %v", err.Error()), 500)
+			log.Printf("error creating delete folder: %v", err.Error())
+			return
+		}
+		similarPictures := []string{}
+		similarIndex := 0
+		for {
+			key := fmt.Sprintf("similar[%d]", similarIndex)
+			similarPicture := r.Form.Get(key)
+			if similarPicture == "" {
+				break
+			}
+			similarPictures = append(similarPictures, similarPicture)
+			similarIndex++
+		}
+		survivors := map[string]struct{}{}
+		for image := range r.Form {
+			survivors[image] = struct{}{}
+		}
+		for _, image := range similarPictures {
+			if _, ok := survivors[image]; ok {
+				continue
+			}
+			err = os.Rename(filepath.Join(rootFolder, image), filepath.Join(rootFolder, toDeleteFolder, image))
+			if err != nil {
+				http.Error(w, fmt.Sprintf("error moving image: %v", err.Error()), 500)
+				log.Printf("error moving image: %v", err.Error())
+				return
+			}
+		}
+		http.RedirectHandler("/similar", 301).ServeHTTP(w, r)
+
+	})
+
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(rootFolder))))
 
 	fs := http.FileServer(http.FS(assets))
@@ -86,18 +134,19 @@ func main() {
 	}
 }
 
-func getImageFiles(folderPath string) []string {
+func getImageFiles(folderPath string) ([]string, error) {
 	var imageFiles []string
-	_ = filepath.Walk(folderPath, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
+	allFiles, err := os.ReadDir(folderPath)
+	if err != nil {
+		return nil, err
+	}
+	for _, file := range allFiles {
+
+		if !file.IsDir() && isImageFile(file.Name()) {
+			imageFiles = append(imageFiles, file.Name())
 		}
-		if !info.IsDir() && isImageFile(path) {
-			imageFiles = append(imageFiles, filepath.Base(path))
-		}
-		return nil
-	})
-	return imageFiles
+	}
+	return imageFiles, nil
 }
 
 func isImageFile(filename string) bool {

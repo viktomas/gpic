@@ -7,6 +7,9 @@
 <body>
 	<h1>Decide which one will stay</h1>
 	<form method="post" action="/delete-similar">
+		{{ range $i, $pic := .pictures }}
+			<input type=hidden name="similar[{{ $i }}]" value="{{ $pic }}">
+		{{ end }}
 	<div class="control-bar">
 		<input type="submit" value="Delete pictures that are not selected"/>
 	</div>
