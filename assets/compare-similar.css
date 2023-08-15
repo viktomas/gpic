@@ -1,0 +1,59 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    text-align: center;
+    margin: 20px;
+}
+
+ul {
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+li {
+  padding: 0;
+  list-style-type: none;
+  max-height: 33vh;
+  max-width: 33vw;
+}
+
+.pic-num-2 li{
+  max-height: 100vh;
+  max-width: 50vw;
+}
+.pic-num-4 li {
+  max-height: 50vh;
+  max-width: 50vw;
+}
+
+label, .container, .li {
+	box-sizing: border-box;
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+
+input[type="checkbox"] {
+	display:none;
+}
+
+input[type="checkbox"] + label{
+	padding: 0.5rem;
+}
+
+input[type="checkbox"]:checked + label{
+	background-color: green;
+}

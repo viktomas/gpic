@@ -10,8 +10,8 @@
 	<div class="control-bar">
 		<input type="submit" value="Delete pictures that are not selected"/>
 	</div>
-	<ul class="image-wrapper">
-		{{range .}}
+	<ul class="image-wrapper pic-num-{{ .grid }}">
+		{{ range .pictures }}
 		<li>
 			<div class="container">
 				<input type="checkbox" value="true" name="{{ . }}" id="{{ . }}" />

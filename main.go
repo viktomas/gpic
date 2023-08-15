@@ -58,7 +58,16 @@ func main() {
 			imageFiles = append(imageFiles, k)
 		}
 		sort.Strings(imageFiles)
-		err := tmpl.Execute(w, imageFiles)
+		grid := 9
+		if len(imageFiles) <= 2 {
+			grid = 2
+		} else if len(imageFiles) <= 4 {
+			grid = 4
+		}
+		err := tmpl.Execute(w, map[string]any{
+			"grid":     grid,
+			"pictures": imageFiles,
+		})
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 		}
