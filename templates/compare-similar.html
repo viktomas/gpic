@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>PicSort - Compare similar</title>
+	<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+	<h1>Decide which one will stay</h1>
+	<form method="post" action="/delete-similar">
+	<div class="control-bar">
+		<input type="submit" value="Delete pictures that are not selected"/>
+	</div>
+	<ul class="image-wrapper">
+		{{range .}}
+		<li>
+			<div class="container">
+				<input type="checkbox" value="true" name="{{ . }}" id="{{ . }}" />
+				<label for="{{ . }}">
+					<img loading="lazy" src="/static/{{.}}" alt="{{.}}">
+				</label>
+			</div>
+		</li>
+		{{end}}
+	</ul>
+	</form>
+</body>
+</html>

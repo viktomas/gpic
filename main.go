@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	_ "embed"
 	"fmt"
 	"html/template"
@@ -8,13 +9,17 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 )
 
-//go:embed assets/index.html
+//go:embed templates/index.html
 var indexTemplate string
 
-//go:embed assets/style.css
-var css string
+//go:embed templates/compare-similar.html
+var compareSimilarTemplate string
+
+//go:embed assets
+var assets embed.FS
 
 func main() {
 	if len(os.Args) != 2 {
@@ -25,6 +30,16 @@ func main() {
 	rootFolder := os.Args[1]
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			w.WriteHeader(404)
+			io.WriteString(w, "Page not found.")
+			return
+		}
+		http.RedirectHandler("/similar", 301).ServeHTTP(w, r)
+
+	})
+
+	http.HandleFunc("/similar", func(w http.ResponseWriter, r *http.Request) {
 		tmpl := template.Must(template.New("index").Parse(indexTemplate))
 		imageFiles := getImageFiles(rootFolder)
 
@@ -34,12 +49,25 @@ func main() {
 		}
 	})
 
+	http.HandleFunc("/compare-similar", func(w http.ResponseWriter, r *http.Request) {
+		tmpl := template.Must(template.New("compare-similar").Parse(compareSimilarTemplate))
+		imageFiles := []string{}
+
+		for k := range r.URL.Query() {
+
+			imageFiles = append(imageFiles, k)
+		}
+		sort.Strings(imageFiles)
+		err := tmpl.Execute(w, imageFiles)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+		}
+	})
+
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(rootFolder))))
 
-	http.HandleFunc("/assets/style.css", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "text/css")
-		io.WriteString(w, css)
-	})
+	fs := http.FileServer(http.FS(assets))
+	http.Handle("/assets/", fs)
 
 	addr := "localhost:8080"
 	fmt.Printf("Starting server at http://%s\n", addr)
