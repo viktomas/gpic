@@ -9,9 +9,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"sort"
+	"sync"
+	"time"
 )
 
 //go:embed templates/similar.html
@@ -141,10 +145,39 @@ func main() {
 	http.Handle("/assets/", fs)
 
 	addr := "localhost:8080"
-	fmt.Printf("Starting server at http://%s\n", addr)
-	err := http.ListenAndServe(addr, nil)
+	url := fmt.Sprintf("http://%s", addr)
+	fmt.Printf("Starting server at %s\n", url)
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	var err error
+	go func() {
+		defer wg.Done()
+		err = http.ListenAndServe(addr, nil)
+		if err != nil {
+			fmt.Printf("Error: %s\n", err)
+		}
+	}()
+
+	time.Sleep(100 * time.Millisecond)
 	if err != nil {
-		fmt.Printf("Error: %s\n", err)
+		return
+	}
+	err = osOpenURL(url)
+	if err != nil {
+		fmt.Println("Error opening URL:", err)
+	}
+	wg.Wait()
+}
+
+func osOpenURL(url string) error {
+
+	switch runtime.GOOS {
+	case "darwin": // macOS
+		return exec.Command("open", url).Start()
+	case "windows":
+		return exec.Command("cmd", "/c", "start", url).Start()
+	default: // Linux and other Unix-like systems
+		return exec.Command("xdg-open", url).Start()
 	}
 }
 
