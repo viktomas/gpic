@@ -1,3 +1,3 @@
-module github.com/viktomas/picsort
+module github.com/viktomas/gpic
 
 go 1.20

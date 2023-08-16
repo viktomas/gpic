@@ -25,7 +25,7 @@ var assets embed.FS
 
 func main() {
 	if len(os.Args) != 2 {
-		fmt.Println("Usage: picsort <folder>")
+		fmt.Println("Usage: gpic <folder>")
 		return
 	}
 

@@ -1,6 +1,6 @@
 SHELL = /bin/bash
 .SILENT: # comment this one out if you need to debug the Makefile
-APP=picsort
+APP=gpic
 
 .PHONY: run
 run:
