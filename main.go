@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -154,6 +155,18 @@ func main() {
 		defer wg.Done()
 		err = http.ListenAndServe(addr, nil)
 		if err != nil {
+			fmt.Printf("Warning: %s\n", err)
+			err = nil
+			port, err := findAvailablePort()
+			if err != nil {
+				fmt.Printf("Error: %s\n", err)
+				return
+			}
+			addr = fmt.Sprintf("localhost:%d", port)
+			url = fmt.Sprintf("http://%s", addr)
+			err = http.ListenAndServe(addr, nil)
+		}
+		if err != nil {
 			fmt.Printf("Error: %s\n", err)
 		}
 	}()
@@ -199,4 +212,15 @@ func getImageFiles(folderPath string) ([]string, error) {
 func isImageFile(filename string) bool {
 	ext := filepath.Ext(filename)
 	return ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif"
+}
+
+func findAvailablePort() (int, error) {
+	listener, err := net.Listen("tcp", "localhost:0") // 0 indicates a random available port
+	if err != nil {
+		return 0, err
+	}
+	defer listener.Close()
+
+	addr := listener.Addr().(*net.TCPAddr)
+	return addr.Port, nil
 }
