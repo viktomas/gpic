@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 )
 
@@ -47,7 +48,15 @@ func main() {
 			http.Error(w, err.Error(), 500)
 		}
 
-		err = tmpl.Execute(w, imageFiles)
+		absPath, err := filepath.Abs(rootFolder)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+		}
+
+		err = tmpl.Execute(w, map[string]any{
+			"pictures": imageFiles,
+			"fullPath": absPath,
+		})
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 		}
@@ -103,8 +112,13 @@ func main() {
 			similarIndex++
 		}
 		survivors := map[string]struct{}{}
+		linkToSurvivor := ""
 		for image := range r.Form {
 			survivors[image] = struct{}{}
+			// ignore the similar[0] keys
+			if !regexp.MustCompile(`^similar\[\d+\]`).MatchString(image) {
+				linkToSurvivor = image
+			}
 		}
 		for _, image := range similarPictures {
 			if _, ok := survivors[image]; ok {
@@ -117,7 +131,7 @@ func main() {
 				return
 			}
 		}
-		http.RedirectHandler("/similar", 301).ServeHTTP(w, r)
+		http.RedirectHandler(fmt.Sprintf("/similar#%s-container", linkToSurvivor), 301).ServeHTTP(w, r)
 
 	})
 

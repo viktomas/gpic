@@ -11,6 +11,9 @@ h1 {
     text-align: center;
     margin: 20px;
 }
+p {
+	text-align: center;
+}
 
 .control-bar {
   position: fixed;
