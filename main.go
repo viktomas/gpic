@@ -19,10 +19,10 @@ import (
 	"time"
 )
 
-//go:embed templates/similar.html
+//go:embed templates/similar.tmpl.html
 var simlarTemplate string
 
-//go:embed templates/compare-similar.html
+//go:embed templates/compare-similar.tmpl.html
 var compareSimilarTemplate string
 
 //go:embed assets
